@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tom Studio | Multimedia Portfolio</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #e46bbe;
+            color: rgb(82, 183, 102);
+            margin: 0;
+            padding: 250px;
+        }
+
+        h1 {
+            color: #3e47a6;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            margin-right: auto;
+            padding: 0cap;
+        }
+
+        
+        h2 {
+            color: #8347ea;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            margin-right: auto;
+            padding: 0cap;
+        }
+
+        
+          
+
+              .container {
+            max-width: 1000px;
+            margin: auto;
+            
+        }
+
+        input, select, button {
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input, select {
+            background: #2385b5;
+            color: white;
+        }
+
+        button {
+            background: #00e0b8;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #f6f7f57a;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #3cc15f;
+            text-align: left;
+        }
+
+        th {
+            background: #2ea646;
+            color: #1e887d;
+        }
+
+        tr:hover {
+            background: #a0c16d;
+        }
+
+        .delete {
+            background: #6b57ce;
+            color: rgb(247, 247, 250);
+        }
+
+        @media (max-width: 650px) {
+            .table-wrapper {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <i><u><h1>NTWARI FRED STUDIO</h1></u></i>
+   <u><h2> <div class><p>VIDEO EDITING | GRAPHIC DESIGN | MULTIMEDIA</p></div></h2></u>
+    <h2>ADD NEW PROJECT</h2>
+
+    <form id="projectForm">
+        <input id="name" placeholder="Project name" required>
+
+        <select id="category" required>
+            <option value="">Select category</option>
+            <option>fred.Video Editing</option>
+            <option>fred.Graphic Design</option>
+            <option>fred.Photography</option>
+            <option>fred.Audio</option>
+            <option>fred.Multimedia Study</option>
+        </select>
+
+        <input id="file" placeholder="File name or location" required>
+
+        <input id="date" type="date" required>
+
+        <button type="submit">Add Project</button>
+    </form>
+
+    <h2>ABOUT MY PROJECT</h2>
+
+    <input
+        id="search"
+        placeholder="Search projects..."
+        oninput="displayProjects()"
+    >
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Project Name</th>
+                    <th>Category</th>
+                    <th>File Location</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="projectTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    let projects = JSON.parse(
+        localStorage.getItem("fredProjects") || "[]"
+    );
+
+    function saveProjects() {
+        localStorage.setItem(
+            "fredProjects",
+            JSON.stringify(projects)
+        );
+    }
+
+    function displayProjects() {
+        const search = document
+            .getElementById("search")
+            .value.toLowerCase();
+
+        const table = document.getElementById("projectTable");
+        table.innerHTML = "";
+
+        projects
+            .filter(project =>
+                (project.name + " " + project.category + " " +
+                project.file).toLowerCase().includes(search)
+            )
+            .forEach(project => {
+                const row = document.createElement("tr");
+
+                [
+                    project.id,
+                    project.name,
+                    project.category,
+                    project.file,
+                    project.date
+                ].forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+
+                const actionCell = document.createElement("td");
+                const deleteButton = document.createElement("button");
+
+                deleteButton.textContent = "Delete";
+                deleteButton.className = "delete";
+
+                deleteButton.onclick = () => {
+                    if (confirm("Delete this project?")) {
+                        projects = projects.filter(
+                            item => item.id !== project.id
+                        );
+                        saveProjects();
+                        displayProjects();
+                    }
+                };
+
+                actionCell.appendChild(deleteButton);
+                row.appendChild(actionCell);
+                table.appendChild(row);
+            });
+    }
+
+    document.getElementById("projectForm")
+        .addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            projects.push({
+                id: Date.now(),
+                name: document.getElementById("name").value.trim(),
+                category: document.getElementById("category").value,
+                file: document.getElementById("file").value.trim(),
+                date: document.getElementById("date").value
+            });
+
+            saveProjects();
+            displayProjects();
+            this.reset();
+        });
+
+    displayProjects();
+</script>
+
+</body>
+</html>
